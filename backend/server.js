@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
 const { SupabaseClient, createClient } = require('@supabase/supabase-js/dist/index.cjs');
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -28,8 +29,18 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ error: "Biometricconsent required." });
         }
 
-        //Mock ML embeddig(TEMPORAY)
-        const dummy_embedding = new Array(512).fill(0.5);
+        let final_embedding;
+
+        try {
+            const ml_responsse = await axios.post('http://localhost:8001/api/face/embed', {
+                image_base64: baseline_image_base64
+            });
+            final_embedding = ml_responsse.data.embedding;
+        }
+        catch (ml_error) {
+            console.warn("ML Service (Port 8001) is offline. Using fallback for developement");
+            final_embedding = new Array(512).fill(0.5);
+        }
 
         const { data, error } = await supabase
             .from('members')
@@ -39,7 +50,7 @@ app.post('/api/register', async (req, res) => {
                     full_name: full_name,
                     domain: domain,
                     github_handle: github_handle,
-                    face_embedding: dummy_embedding,
+                    face_embedding: final_embedding,
                     consent_at: new Date()
                 }
             ])
