@@ -223,6 +223,37 @@ app.post('/api/sessions/end', async (req, res) => {
     }
 });
 
+app.post('/api/sessions/rotate', async (req, res) => {
+    try {
+        const { session_id } = req.body;
+        if (!session_id) {
+            return res.status(400).json({ error: "Missing session_id." });
+        }
+        const new_token = Math.floor(1000 + Math.random() * 9000).toString();
+
+        const { data, error } = await supabase
+            .from('sessions')
+            .update({ current_room_token: new_token })
+            .eq('id', session_id)
+            .eq('status', 'ACTIVE')
+            .select();
+
+        if (error || data.length === 0) {
+            return res.status(400).json({ error: "Failed to rotate token. Is the class still active?" });
+        }
+
+        res.json({
+            message: "Token rotated successfully.",
+            new_room_token: new_token
+        });
+
+    }
+    catch (err) {
+        console.error("Seerver Error:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.listen(PORT, () => {
     console.log("OmniScan Backend is running on port " + PORT);
 });
