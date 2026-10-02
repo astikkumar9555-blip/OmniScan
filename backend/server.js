@@ -199,6 +199,30 @@ app.post('/api/sessions/start', async (req, res) => {
     }
 });
 
+app.post('/api/sessions/end', async (req, res) => {
+    try {
+        const { session_id } = req.body;
+        if (!session_id) {
+            return res.status(400).json({ error: "Missing session_id." });
+        }
+        const { error } = await supabase
+            .from('sessions')
+            .update({ status: 'CLOSED', current_room_token: null })
+            .eq('id', session_id);
+
+        if (error) {
+            console.error("End Session Error:", error);
+            return res.status(500).json({ error: "Failed to close the session." });
+        }
+
+        res.json({ message: "Session officially closed. No more check-ins allowed." });
+    }
+    catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.listen(PORT, () => {
     console.log("OmniScan Backend is running on port " + PORT);
 });
