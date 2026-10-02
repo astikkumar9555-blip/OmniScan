@@ -160,6 +160,45 @@ app.post('/api/checkin', async (req, res) => {
     }
 });
 
+app.post('/api/sessions/start', async (req, res) => {
+    try {
+        const { title, latitude, longitude } = req.body;
+        if (!title || !latitude || !longitude) {
+            return res.status(400).json({ error: "Missing required session details." });
+        }
+
+        const initial_token = Math.floor(1000 + Math.random() * 9000).toString();
+
+        const wkt_location = `POINT(${longitude} ${latitude})`;
+
+        const { data, error } = await supabase
+            .from('sessions')
+            .insert([{
+                title: title,
+                status: 'ACTIVE',
+                current_room_token: initial_token,
+                radius_m: 15,
+                lab_location: wkt_location
+            }])
+            .select();
+
+        if (error) {
+            console.error("Session Creation Error:", error);
+            return res.status(500).json({ error: "Failed to create class session." });
+        }
+
+        res.json({
+            message: "Session started successfully!",
+            session_id: data[0].id,
+            current_room_token: data[0].current_room_token
+        });
+
+    } catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.listen(PORT, () => {
     console.log("OmniScan Backend is running on port " + PORT);
 });
