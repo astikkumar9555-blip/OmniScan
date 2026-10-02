@@ -254,6 +254,40 @@ app.post('/api/sessions/rotate', async (req, res) => {
     }
 });
 
+app.get('/api/sessions/attendance/:session_id', async (req, res) => {
+    try {
+        const { session_id } = req.params;
+        const { data, error } = await supabase
+            .from('attendance')
+            .select(`
+                status,
+                created_at,
+                members(roll_number)
+            `)
+            .eq('session_id', session_id);
+
+        if (error) {
+            console.error("Dashboard Fetch Error:", error);
+            return res.status(500).json({ error: "Failed to fetch attendance data." });
+        }
+
+        const formattedList = data.map(record => ({
+            roll_number: record.members.roll_number,
+            status: record.status,
+            time_logged: record.created_at
+        }));
+
+        res.json({
+            total_present: formattedList.length,
+            students: formattedList
+        });
+    }
+    catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.listen(PORT, () => {
     console.log("OmniScan Backend is running on port " + PORT);
 });
