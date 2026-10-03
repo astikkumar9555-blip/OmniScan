@@ -170,6 +170,9 @@ function AuthLayout() {
       </section>
 
       <section ref={cardRef} className="login-container" aria-hidden={!lampOn}>
+        <div className="portal-brand" aria-label="Netra logo">
+          <img className="portal-logo" src="/netra-logo.svg" alt="Netra" />
+        </div>
         <h1 className="portal-title">SMART ATTENDANCE PORTAL</h1>
         <Outlet />
       </section>
