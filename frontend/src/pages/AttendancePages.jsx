@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  FiAlertTriangle,
+  FiCalendar,
   FiCamera,
+  FiClock,
   FiBriefcase,
   FiEdit2,
   FiFlag,
   FiGithub,
+  FiInfo,
   FiLink,
   FiShield,
   FiUser,
@@ -115,67 +119,78 @@ export function MarkAttendancePage() {
   };
 
   return (
-    <div className="dash-page-view subpage-view">
-      <PageHeading eyebrow="TODAY" title="Mark attendance" copy="Check your camera before your session begins." />
-      <section className="mark-attendance-layout">
+    <div className="mark-attendance-page">
+      <div className="attendance-copy-block">
+        <h1>Mark Your Attendance</h1>
+        <p>Position your face in the frame and click on start scanning</p>
+      </div>
+
+      <div className="mark-attendance-layout">
         <div className="camera-panel">
           <div className={`camera-preview${cameraState === "ready" ? " live" : ""}`}>
             <video ref={videoRef} autoPlay muted playsInline aria-label="Live camera preview" hidden={cameraState !== "ready"} />
             {cameraState !== "ready" && (
               <div className="camera-placeholder">
-                <FiCamera size={36} aria-hidden="true" />
-                <strong>{cameraState === "denied" ? "Camera access blocked" : "Camera preview"}</strong>
-                <span>{cameraError && !errorAnimationDone ? "Showing help for this camera issue…" : cameraError || "Your camera stays off until you start the check."}</span>
+                <span className="camera-placeholder-text">selfie Camera view</span>
               </div>
             )}
           </div>
-          {issueMessage && errorAnimationDone && (
-            <div className={`attendance-problem${cameraError ? " error" : " warning"}`} role={cameraError || !navigator.onLine ? "alert" : "status"}>
-              <h3>{issueTitle}</h3>
-              <p>{issueMessage}</p>
-              <details>
-                <summary>See common causes and what to try</summary>
-                <ul>
-                  <li>Internet: reconnect to Wi-Fi/mobile data. This app currently has no server-based attendance checks, so browser network status may not reflect every internet issue.</li>
-                  <li>Permission: allow camera access in your browser&apos;s site settings, then retry.</li>
-                  <li>No camera found: connect or enable a camera and reload the page.</li>
-                  <li>Camera busy: close other apps or browser tabs using it, then retry.</li>
-                  <li>Browser/security: use a supported browser over HTTPS or localhost.</li>
-                </ul>
-              </details>
+
+          <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"}>
+            <FiCamera size={16} aria-hidden="true" />
+            {cameraState === "loading" ? "Connecting…" : "Start Scanning"}
+          </button>
+
+          <div className="camera-meta-row">
+            <div className="meta-item">
+              <div className="meta-icon"><FiCalendar size={16} aria-hidden="true" /></div>
+              <div className="meta-copy">
+                <span>Date</span>
+                <strong>Tue, 30 Sep 2025</strong>
+              </div>
             </div>
-          )}
-          {issueMessage && (
-            <AttendanceWelcome
-              studentName={getSession()?.name}
-              issueMessage={`${issueTitle}. ${issueMessage}`}
-              showPullCard={false}
-              onIssueComplete={revealIssueDetails}
-            />
-          )}
-          <div className="camera-actions">
-            <div>
-              <strong>{cameraState === "ready" ? "Camera connected" : "Camera check"}</strong>
-              <p>Preview only. Face recognition and attendance submission are not connected yet.</p>
+            <div className="meta-divider" aria-hidden="true" />
+            <div className="meta-item">
+              <div className="meta-icon"><FiClock size={16} aria-hidden="true" /></div>
+              <div className="meta-copy">
+                <span>Time</span>
+                <strong>02:24 PM</strong>
+              </div>
             </div>
-            {cameraState === "ready" ? (
-              <button className="action-button secondary" type="button" onClick={stopCamera} data-button-animation>Stop camera</button>
-            ) : (
-              <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"}>
-                {cameraState === "loading" ? "Connecting…" : "Start camera"}
-              </button>
-            )}
+            <div className="meta-divider" aria-hidden="true" />
+            <div className="meta-item status-item">
+              <div className="meta-copy">
+                <span>Attendance Status</span>
+                <strong className="status-pill">Not Marked</strong>
+              </div>
+            </div>
           </div>
         </div>
-        <aside className="panel checkin-panel">
-          <p className="dash-eyebrow">CHECK-IN</p>
-          <h2>Before you begin</h2>
-          <div className="checkin-step"><span>01</span><p>Allow camera access for a clear preview.</p></div>
-          <div className="checkin-step"><span>02</span><p>Position yourself in a well-lit space.</p></div>
-          <div className="checkin-step"><span>03</span><p>Attendance can be submitted when identity verification is connected.</p></div>
-          <div className="notice-line"><FiShield size={16} aria-hidden="true" /> Camera is only activated when you start it.</div>
+
+        <aside className="attendance-tips-pane">
+          <div className="info-card tip-card">
+            <div className="info-card-header">
+              <div className="info-card-icon info-card-icon--soft"><FiInfo size={14} aria-hidden="true" /></div>
+              <h3>Scanning Tips</h3>
+              <button type="button" className="dismiss-button" aria-label="Close tips">×</button>
+            </div>
+            <ul>
+              <li>Make sure your face is clearly visible.</li>
+              <li>Ensure good lighting (avoid dark areas).</li>
+              <li>Keep your face steady and look straight.</li>
+            </ul>
+          </div>
+
+          <div className="info-card warning-card">
+            <div className="info-card-header">
+              <div className="info-card-icon info-card-icon--warn"><FiAlertTriangle size={14} aria-hidden="true" /></div>
+              <h3>Low Light Detected</h3>
+              <button type="button" className="dismiss-button" aria-label="Close warning">×</button>
+            </div>
+            <p>The light is a bit low, please make sure your face is well lit for better recognition.</p>
+          </div>
         </aside>
-      </section>
+      </div>
     </div>
   );
 }
