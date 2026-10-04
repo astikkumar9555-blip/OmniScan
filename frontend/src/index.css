@@ -172,11 +172,14 @@ body { margin: 0; line-height: 1.5; }
 }
 .portal-brand { display: flex; justify-content: center; margin: 0 0 18px; }
 .portal-logo { display: block; width: min(100%, 190px); height: auto; filter: drop-shadow(0 8px 22px rgba(105, 0, 0, 0.14)); }
+.button-animation-canvas { position: fixed; inset: 0; z-index: 20; width: 100%; height: 100%; pointer-events: none; }
 .portal-title { margin: 0 0 22px; color: var(--primary); font-family: 'Manrope', sans-serif; font-size: 23px; font-weight: 800; line-height: 1.2; white-space: nowrap; }
 .auth-form h2 { margin: 0; color: var(--heading); font-family: 'Manrope', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
 .login-copy { margin: 9px 0 24px; color: var(--muted); font-size: 14px; }
 .auth-form { margin: 0; }
 .auth-form .input-group { margin-bottom: 15px; }
+.auth-form .input-group label { font-size: 14px; }
+.auth-form .input-group input { font-size: 16px; }
 
 .input-group { margin-bottom: 18px; }
 .input-group label { display: block; margin: 0 0 7px; color: var(--heading); font-size: 13px; font-weight: 600; }

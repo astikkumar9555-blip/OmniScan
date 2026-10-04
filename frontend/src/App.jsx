@@ -16,6 +16,7 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { getSession } from "./auth";
+import ButtonAnimation from "./ButtonAnimation";
 import "./index.css";
 
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
@@ -183,6 +184,7 @@ function AuthLayout() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ButtonAnimation />
       <Routes>
         <Route element={<AuthLayout />}>
           <Route index element={<Navigate to="/login" replace />} />

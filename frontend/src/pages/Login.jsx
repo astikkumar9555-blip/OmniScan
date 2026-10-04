@@ -33,7 +33,7 @@ export default function Login() {
       )}
 
       <div className="input-group">
-        <label htmlFor="studentId">Student number / ID or email</label>
+        <label htmlFor="studentId"> <h3>Student ID / Email</h3></label>
         <input
           id="studentId"
           name="studentId"
@@ -45,7 +45,7 @@ export default function Login() {
       </div>
 
       <div className="input-group">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password"> <h3>Password</h3></label>
         <input
           id="password"
           name="password"
@@ -58,7 +58,7 @@ export default function Login() {
       </div>
 
       <button type="submit" className="sign-in-button">
-        Log in
+        <h1> Log in</h1>
       </button>
 
       <p className="switch">
