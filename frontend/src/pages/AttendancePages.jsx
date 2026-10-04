@@ -18,6 +18,7 @@ export function MarkAttendancePage() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [cameraState, setCameraState] = useState("idle");
+  const [cameraError, setCameraError] = useState("");
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -26,16 +27,33 @@ export function MarkAttendancePage() {
   const startCamera = async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
       setCameraState("unsupported");
+      setCameraError(
+        window.isSecureContext
+          ? "Camera access is not supported in this browser."
+          : "Camera access requires a secure connection. Open this site using HTTPS or localhost.",
+      );
       return;
     }
+    setCameraError("");
     setCameraState("loading");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
       setCameraState("ready");
-    } catch {
+    } catch (error) {
       setCameraState("denied");
+      if (error.name === "NotAllowedError" || error.name === "SecurityError") {
+        setCameraError(
+          "Camera permission was blocked. Allow camera access for this site in your browser's address-bar or site settings, then try again.",
+        );
+      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        setCameraError("No camera was found. Connect a camera and try again.");
+      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        setCameraError("The camera is busy or unavailable. Close other apps using it and try again.");
+      } else {
+        setCameraError(`Could not start the camera${error.message ? `: ${error.message}` : "."}`);
+      }
     }
   };
 
@@ -43,6 +61,7 @@ export function MarkAttendancePage() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
+    setCameraError("");
     setCameraState("idle");
   };
 
@@ -57,10 +76,11 @@ export function MarkAttendancePage() {
               <div className="camera-placeholder">
                 <FiCamera size={36} aria-hidden="true" />
                 <strong>{cameraState === "denied" ? "Camera access blocked" : "Camera preview"}</strong>
-                <span>{cameraState === "unsupported" ? "Camera access is not supported in this browser." : "Your camera stays off until you start the check."}</span>
+                <span>{cameraError || "Your camera stays off until you start the check."}</span>
               </div>
             )}
           </div>
+          {cameraError && <p className="profile-feedback" role="alert">{cameraError}</p>}
           <div className="camera-actions">
             <div>
               <strong>{cameraState === "ready" ? "Camera connected" : "Camera check"}</strong>

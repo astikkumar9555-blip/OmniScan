@@ -127,17 +127,49 @@ export default function ButtonAnimation() {
         halos.length = 0;
       }
 
-      const bubbleCount = viewportScale < 0.75 ? 12 : 18;
+      const bubbleCount = bubblesOnly
+        ? viewportScale < 0.75
+          ? 24
+          : 32
+        : viewportScale < 0.75
+          ? 12
+          : 18;
+      const bubbleColumns = bubblesOnly ? (viewportScale < 0.75 ? 6 : 8) : 1;
+      const bubbleRows = Math.ceil(bubbleCount / bubbleColumns);
       for (let i = 0; i < bubbleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = (1.5 + Math.random() * 2.5) * viewportScale;
         const duration = 1750 + Math.random() * 250;
+        const column = i % bubbleColumns;
+        const row = Math.floor(i / bubbleColumns);
+        const spreadX = rect.width * 0.84;
+        const spreadY = rect.height * 0.8;
+        const startX = bubblesOnly
+          ? rect.left +
+            rect.width * 0.08 +
+            ((column + Math.random() * 0.7 + 0.15) / bubbleColumns) * spreadX
+          : x;
+        const startY = bubblesOnly
+          ? rect.top +
+            rect.height * 0.1 +
+            ((row + Math.random() * 0.7 + 0.15) / bubbleRows) * spreadY
+          : y;
+        const burstAngle = Math.atan2(startY - y, startX - x);
+        const driftAngle = burstAngle + (Math.random() - 0.5) * 1.1;
+        const driftSpeed = (3 + Math.random() * 3) * Math.max(viewportScale, 0.8);
         bubbles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - viewportScale,
-          radius: (6 + Math.random() * 8) * viewportScale,
+          x: startX,
+          y: startY,
+          vx: bubblesOnly
+            ? Math.cos(driftAngle) * driftSpeed
+            : Math.cos(angle) * speed,
+          vy: bubblesOnly
+            ? Math.sin(driftAngle) * driftSpeed - 0.8
+            : Math.sin(angle) * speed - viewportScale,
+          radius: bubblesOnly
+            ? Math.min(rect.height * 0.18, (8 + Math.random() * 7) * viewportScale)
+            : (6 + Math.random() * 8) * viewportScale,
+          gravity: bubblesOnly ? 0.004 : 0.035,
           color: palette[Math.floor(Math.random() * palette.length)],
           born: now,
           duration,
@@ -225,7 +257,7 @@ export default function ButtonAnimation() {
         const progress = age / bubble.duration;
         const seconds = (age / 16) * (900 / bubble.duration);
         const x = bubble.x + bubble.vx * seconds;
-        const y = bubble.y + bubble.vy * seconds - seconds * seconds * 0.035;
+        const y = bubble.y + bubble.vy * seconds - seconds * seconds * bubble.gravity;
         const radius = bubble.radius * (1 + progress * 0.5);
         const gradient = context.createRadialGradient(
           x - radius * 0.3,
