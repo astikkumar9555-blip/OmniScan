@@ -53,7 +53,7 @@ export default function DashboardLayout() {
     <div className="dash">
       <aside className="dash-sidebar">
         <NavLink className="dash-logo" to="/dashboard" aria-label="Netra home">
-          <img className="dash-logo-image" src="/netra-logo.svg" alt="Netra" />
+          <img className="dash-logo-image" src="/netra-logo.svg.png" alt="Netra" />
         </NavLink>
 
         <nav className="dash-nav" aria-label="Dashboard navigation">

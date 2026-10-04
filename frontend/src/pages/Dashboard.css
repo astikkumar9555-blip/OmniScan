@@ -37,7 +37,7 @@
   margin-bottom: 28px;
   padding: 10px;
   border-radius: 4px;
-  background: var(--dash-cream);
+  background: #fffbff;
 }
 
 .dash-logo-image { display: block; width: min(100%, 160px); height: 49px; object-fit: contain; }
