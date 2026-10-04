@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FiCamera,
   FiBriefcase,
@@ -10,6 +10,7 @@ import {
   FiUser,
   FiUsers,
 } from "react-icons/fi";
+import AttendanceWelcome from "../AttendanceWelcome";
 import { getSession } from "../auth";
 import { MOCK_ATTENDANCE, MOCK_SUMMARY, fmtShort } from "./Dashboard";
 import "./Dashboard.css";
@@ -19,6 +20,54 @@ export function MarkAttendancePage() {
   const streamRef = useRef(null);
   const [cameraState, setCameraState] = useState("idle");
   const [cameraError, setCameraError] = useState("");
+  const [networkIssue, setNetworkIssue] = useState("");
+  const [errorAnimationDone, setErrorAnimationDone] = useState(false);
+
+  useEffect(() => {
+    const connection = navigator.connection;
+    const updateNetworkIssue = () => {
+      if (!navigator.onLine) {
+        setNetworkIssue("Your browser reports that this device is offline. Reconnect to Wi-Fi or mobile data and try again.");
+        return;
+      }
+
+      if (
+        connection &&
+        (connection.effectiveType === "slow-2g" ||
+          connection.effectiveType === "2g" ||
+          connection.rtt >= 2_000)
+      ) {
+        setNetworkIssue("Your browser reports a very slow network connection. Some online features may take longer or fail.");
+        return;
+      }
+
+      setNetworkIssue("");
+    };
+
+    updateNetworkIssue();
+    window.addEventListener("online", updateNetworkIssue);
+    window.addEventListener("offline", updateNetworkIssue);
+    connection?.addEventListener("change", updateNetworkIssue);
+    return () => {
+      window.removeEventListener("online", updateNetworkIssue);
+      window.removeEventListener("offline", updateNetworkIssue);
+      connection?.removeEventListener("change", updateNetworkIssue);
+    };
+  }, []);
+
+  const issueMessage = cameraError || networkIssue;
+  const issueTitle = cameraError
+    ? "Camera could not start"
+    : networkIssue
+      ? navigator.onLine ? "Connection may be slow" : "Device appears offline"
+      : "";
+  const revealIssueDetails = useCallback(() => {
+    setErrorAnimationDone(true);
+  }, []);
+
+  useEffect(() => {
+    setErrorAnimationDone(false);
+  }, [issueMessage]);
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -76,11 +125,34 @@ export function MarkAttendancePage() {
               <div className="camera-placeholder">
                 <FiCamera size={36} aria-hidden="true" />
                 <strong>{cameraState === "denied" ? "Camera access blocked" : "Camera preview"}</strong>
-                <span>{cameraError || "Your camera stays off until you start the check."}</span>
+                <span>{cameraError && !errorAnimationDone ? "Showing help for this camera issue…" : cameraError || "Your camera stays off until you start the check."}</span>
               </div>
             )}
           </div>
-          {cameraError && <p className="profile-feedback" role="alert">{cameraError}</p>}
+          {issueMessage && errorAnimationDone && (
+            <div className={`attendance-problem${cameraError ? " error" : " warning"}`} role={cameraError || !navigator.onLine ? "alert" : "status"}>
+              <h3>{issueTitle}</h3>
+              <p>{issueMessage}</p>
+              <details>
+                <summary>See common causes and what to try</summary>
+                <ul>
+                  <li>Internet: reconnect to Wi-Fi/mobile data. This app currently has no server-based attendance checks, so browser network status may not reflect every internet issue.</li>
+                  <li>Permission: allow camera access in your browser&apos;s site settings, then retry.</li>
+                  <li>No camera found: connect or enable a camera and reload the page.</li>
+                  <li>Camera busy: close other apps or browser tabs using it, then retry.</li>
+                  <li>Browser/security: use a supported browser over HTTPS or localhost.</li>
+                </ul>
+              </details>
+            </div>
+          )}
+          {issueMessage && (
+            <AttendanceWelcome
+              studentName={getSession()?.name}
+              issueMessage={`${issueTitle}. ${issueMessage}`}
+              showPullCard={false}
+              onIssueComplete={revealIssueDetails}
+            />
+          )}
           <div className="camera-actions">
             <div>
               <strong>{cameraState === "ready" ? "Camera connected" : "Camera check"}</strong>
@@ -89,7 +161,7 @@ export function MarkAttendancePage() {
             {cameraState === "ready" ? (
               <button className="action-button secondary" type="button" onClick={stopCamera} data-button-animation>Stop camera</button>
             ) : (
-              <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"} data-button-animation>
+              <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"}>
                 {cameraState === "loading" ? "Connecting…" : "Start camera"}
               </button>
             )}

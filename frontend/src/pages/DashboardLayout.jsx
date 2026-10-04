@@ -121,7 +121,7 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <div className="dash-route" key={location.pathname}>
+        <div className="dash-route page-content" key={location.pathname}>
           <Outlet />
         </div>
       </main>

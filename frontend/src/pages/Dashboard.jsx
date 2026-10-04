@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { afterButtonAnimation } from "../ButtonAnimation";
 import {
   FiArrowRight,
   FiCalendar,
@@ -93,7 +94,7 @@ export default function Dashboard() {
         <div className="banner-mark" aria-hidden="true">N</div>
       </section>
 
-      <section className="dash-stats" aria-label="Attendance summary">
+      <section className="dash-stats grid" aria-label="Attendance summary">
         <div className="stat-card">
           <FiCalendar className="stat-icon" size={18} aria-hidden="true" />
           <span className="stat-label">Total Attendance</span>
@@ -182,7 +183,13 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        <button className="mark-card" type="button" onClick={() => navigate("/mark-attendance")}>
+        <button
+          className="mark-card"
+          type="button"
+          data-button-animation
+          data-animation-style="bubbles"
+          onClick={() => afterButtonAnimation(() => navigate("/mark-attendance"))}
+        >
           <span className="mark-card-decoration" aria-hidden="true">
             <span className="mark-bubble mark-bubble-1" />
             <span className="mark-bubble mark-bubble-2" />
@@ -194,7 +201,10 @@ export default function Dashboard() {
             <span className="mark-star mark-star-3">✦</span>
           </span>
           <span className="mark-card-icon"><FiCalendar size={20} aria-hidden="true" /></span>
-          <span className="mark-card-copy"><strong>Mark attendance</strong><small>Open today&apos;s check-in</small></span>
+          <span className="mark-card-copy">
+            <strong>Mark attendance</strong>
+            <small>Open today&apos;s check-in</small>
+          </span>
           <FiArrowRight className="mark-card-arrow" size={20} aria-hidden="true" />
         </button>
       </section>
