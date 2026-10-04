@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { afterButtonAnimation } from "../ButtonAnimation";
 import {
   FiArrowRight,
   FiCalendar,
@@ -182,7 +183,7 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        <button className="mark-card" type="button" onClick={() => navigate("/mark-attendance")}>
+        <button className="mark-card" type="button" data-button-animation data-animation-style="bubbles" onClick={() => afterButtonAnimation(() => navigate("/mark-attendance"))}>
           <span className="mark-card-icon"><FiCalendar size={20} aria-hidden="true" /></span>
           <span className="mark-card-copy"><strong>Mark attendance</strong><small>Open today&apos;s check-in</small></span>
           <FiArrowRight size={20} aria-hidden="true" />
@@ -191,4 +192,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

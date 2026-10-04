@@ -6,7 +6,32 @@ const BRAND_COLORS = [
   { red: 212, green: 160, blue: 23, hex: "#d4a017" },
   { red: 255, green: 220, blue: 128, hex: "#ffdc80" },
 ];
-const ORBIT_DURATION = 3600;
+const ATTENDANCE_COLORS = [
+  { red: 37, green: 99, blue: 235, hex: "#2563eb" },
+  { red: 14, green: 165, blue: 233, hex: "#0ea5e9" },
+  { red: 125, green: 211, blue: 252, hex: "#7dd3fc" },
+  { red: 219, green: 234, blue: 254, hex: "#dbeafe" },
+];
+const ORBIT_DURATION = 2000;
+let animationStartedAt = 0;
+let navigationTimeout = 0;
+
+export function afterButtonAnimation(action) {
+  const canvas = document.querySelector(".button-animation-canvas");
+  if (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    !canvas?.dataset.animating
+  ) {
+    action();
+    return;
+  }
+  window.clearTimeout(navigationTimeout);
+  const navigationDelay = Math.max(
+    0,
+    animationStartedAt + ORBIT_DURATION * 0.2 - performance.now(),
+  );
+  navigationTimeout = window.setTimeout(action, navigationDelay);
+}
 
 function parseRgb(color) {
   const values = color.match(/[\d.]+/g)?.map(Number);
@@ -78,24 +103,35 @@ export default function ButtonAnimation() {
 
     const spawn = (event) => {
       if (motionQuery.matches) return;
-      const button = event.target.closest("button");
+      const button = event.target.closest("button[data-button-animation]");
       if (!button || button.disabled) return;
+      const form = button.closest("form.auth-form");
+      if (form && !form.checkValidity()) return;
+      canvas.dataset.animating = "true";
 
       const rect = button.getBoundingClientRect();
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
       const now = performance.now();
+      animationStartedAt = now;
       const viewportScale = Math.max(
         0.52,
         Math.min(1, Math.min(width, height) / 760),
       );
-      const palette = getButtonPalette(button);
+      const bubblesOnly = button.dataset.animationStyle === "bubbles";
+      const palette = bubblesOnly
+        ? ATTENDANCE_COLORS
+        : getButtonPalette(button);
+      if (bubblesOnly) {
+        stars.length = 0;
+        halos.length = 0;
+      }
 
       const bubbleCount = viewportScale < 0.75 ? 12 : 18;
       for (let i = 0; i < bubbleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = (1.5 + Math.random() * 2.5) * viewportScale;
-        const duration = 4600 + Math.random() * 500;
+        const duration = 1750 + Math.random() * 250;
         bubbles.push({
           x,
           y,
@@ -108,31 +144,33 @@ export default function ButtonAnimation() {
         });
       }
 
-      const orbitRadius = Math.min(
-        Math.max(rect.width / 2 + 16 * viewportScale, 70 * viewportScale),
-        128 * viewportScale,
-      );
-      const perRing = viewportScale < 0.75 ? [5, 4, 3] : [7, 6, 5];
-      perRing.forEach((count, ring) => {
-        for (let i = 0; i < count; i++) {
-          stars.push({
-            x,
-            y,
-            radius: orbitRadius * [0.72, 0.96, 1.2][ring],
-            tilt: [1.05, -0.7, 0.35][ring],
-            rotation: [0, 0.9, -0.8][ring],
-            direction: ring === 1 ? -1 : 1,
-            speed: [2.6, 2.1, 1.6][ring],
-            angle: (i / count) * Math.PI * 2 + ring * 0.4,
-            color: palette[(i + ring * 2) % palette.length].hex,
-            size: (7 + Math.random() * 4) * viewportScale,
-            spin: (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random() * 2),
-            born: now,
-          });
-        }
-      });
-      halos.push({ x, y, radius: orbitRadius * 0.72, born: now, palette });
-      halos.push({ x, y, radius: orbitRadius * 0.58, born: now + 140, palette });
+      if (!bubblesOnly) {
+        const orbitRadius = Math.min(
+          Math.max(rect.width / 2 + 16 * viewportScale, 70 * viewportScale),
+          128 * viewportScale,
+        );
+        const perRing = viewportScale < 0.75 ? [5, 4, 3] : [7, 6, 5];
+        perRing.forEach((count, ring) => {
+          for (let i = 0; i < count; i++) {
+            stars.push({
+              x,
+              y,
+              radius: orbitRadius * [0.72, 0.96, 1.2][ring],
+              tilt: [1.05, -0.7, 0.35][ring],
+              rotation: [0, 0.9, -0.8][ring],
+              direction: ring === 1 ? -1 : 1,
+              speed: [2.6, 2.1, 1.6][ring],
+              angle: (i / count) * Math.PI * 2 + ring * 0.4,
+              color: palette[(i + ring * 2) % palette.length].hex,
+              size: (7 + Math.random() * 4) * viewportScale,
+              spin: (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random() * 2),
+              born: now,
+            });
+          }
+        });
+        halos.push({ x, y, radius: orbitRadius * 0.72, born: now, palette });
+        halos.push({ x, y, radius: orbitRadius * 0.58, born: now + 140, palette });
+      }
       if (!frameId) frameId = requestAnimationFrame(animate);
     };
 
@@ -296,6 +334,7 @@ export default function ButtonAnimation() {
         frameId = requestAnimationFrame(animate);
       } else {
         context.clearRect(0, 0, width, height);
+        canvas.dataset.animating = "false";
       }
     }
 
@@ -306,6 +345,7 @@ export default function ButtonAnimation() {
       document.removeEventListener("click", spawn, true);
       window.removeEventListener("resize", resize);
       if (frameId) cancelAnimationFrame(frameId);
+      window.clearTimeout(navigationTimeout);
     };
   }, []);
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { afterButtonAnimation } from "../ButtonAnimation";
 import { loginUser } from "../auth";
 
 export default function Login() {
@@ -13,7 +14,7 @@ export default function Login() {
     e.preventDefault();
     try {
       loginUser(form);
-      navigate("/dashboard");
+      afterButtonAnimation(() => navigate("/dashboard"));
     } catch (err) {
       setError(err.message);
     }
@@ -57,7 +58,7 @@ export default function Login() {
         />
       </div>
 
-      <button type="submit" className="sign-in-button">
+      <button type="submit" className="sign-in-button" data-button-animation>
         <h1> Log in</h1>
       </button>
 

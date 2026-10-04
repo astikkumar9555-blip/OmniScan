@@ -67,9 +67,9 @@ export function MarkAttendancePage() {
               <p>Preview only. Face recognition and attendance submission are not connected yet.</p>
             </div>
             {cameraState === "ready" ? (
-              <button className="action-button secondary" type="button" onClick={stopCamera}>Stop camera</button>
+              <button className="action-button secondary" type="button" onClick={stopCamera} data-button-animation>Stop camera</button>
             ) : (
-              <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"}>
+              <button className="action-button" type="button" onClick={startCamera} disabled={cameraState === "loading" || cameraState === "unsupported"} data-button-animation>
                 {cameraState === "loading" ? "Connecting…" : "Start camera"}
               </button>
             )}
@@ -226,7 +226,7 @@ export function ProfilePage() {
             <label>LinkedIn URL<input value={draft.linkedin || ""} onChange={(event) => setDraft({ ...draft, linkedin: event.target.value })} placeholder="https://linkedin.com/in/username" /></label>
             <label>Instagram URL<input value={draft.instagram || ""} onChange={(event) => setDraft({ ...draft, instagram: event.target.value })} placeholder="https://instagram.com/username" /></label>
           </div>
-          <button className="profile-edit-button" type="submit">Save profile</button>
+          <button className="profile-edit-button" type="submit" data-button-animation>Save profile</button>
         </form>
       )}
 
