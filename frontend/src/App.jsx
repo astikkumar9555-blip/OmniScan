@@ -24,6 +24,24 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const Protected = ({ children }) =>
   getSession() ? children : <Navigate to="/login" replace />;
 
+function PageTransitionLight() {
+  const { pathname } = useLocation();
+  const previousPath = useRef(pathname);
+  const [transitionPath, setTransitionPath] = useState(null);
+
+  useEffect(() => {
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    setTransitionPath(pathname);
+    const timeout = window.setTimeout(() => setTransitionPath(null), 4_000);
+    return () => window.clearTimeout(timeout);
+  }, [pathname]);
+
+  return transitionPath ? (
+    <div key={transitionPath} className="page-transition-light" aria-hidden="true" />
+  ) : null;
+}
+
 const PULL_THRESHOLD = 48; // px of pull needed to flip the switch
 const MIN_PULL = -72; // max upward travel
 const MAX_PULL = 100; // max downward travel
@@ -185,6 +203,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ButtonAnimation />
+      <PageTransitionLight />
       <Routes>
         <Route element={<AuthLayout />}>
           <Route index element={<Navigate to="/login" replace />} />
