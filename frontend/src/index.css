@@ -193,7 +193,7 @@ body { margin: 0; line-height: 1.5; }
 
 .sign-in-button {
   width: 100%; min-height: 51px; margin-top: 6px; border: 0; border-radius: 8px;
-  background: var(--primary); color: #fff; font-weight: 700; cursor: pointer;
+  background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
   transition: box-shadow 180ms ease, transform 180ms ease;
 }
 .sign-in-button:hover { box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25); transform: translateY(-1px); }

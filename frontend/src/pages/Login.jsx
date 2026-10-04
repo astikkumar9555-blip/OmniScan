@@ -33,7 +33,7 @@ export default function Login() {
       )}
 
       <div className="input-group">
-        <label htmlFor="studentId">Student number / ID</label>
+        <label htmlFor="studentId">Student number / ID or email</label>
         <input
           id="studentId"
           name="studentId"
