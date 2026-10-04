@@ -1,4 +1,10 @@
 * { box-sizing: border-box; }
+input { transition: transform 180ms ease, box-shadow 180ms ease; }
+input:hover {
+  transform: scale(1.15);
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(13, 135, 13, 0.477);
+}
 html, body, #root { min-height: 100%; }
 body { margin: 0; line-height: 1.5; }
 :root {
@@ -187,7 +193,7 @@ body { margin: 0; line-height: 1.5; }
   width: 100%; min-height: 51px; padding: 0 15px;
   border: 1px solid var(--border); border-radius: 8px; outline: none;
   background: #fff; color: var(--heading); font-size: 14px;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 .input-group input::placeholder { color: var(--muted); }
 .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14); }

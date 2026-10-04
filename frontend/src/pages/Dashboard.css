@@ -92,7 +92,8 @@
 .dash-user-name { color: var(--dash-text); font-size: 10px; }
 .dash button:focus-visible, .dash a:focus-visible, .dash input:focus-visible { outline: 2px solid #c35c31; outline-offset: 3px; }
 
-.dash-banner { margin-bottom: 18px; padding: 22px 26px; border-radius: 8px; background: var(--dash-cream); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
+.dash-banner { margin-bottom: 18px; padding: 22px 26px; border-radius: 8px; background: var(--dash-cream); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); transition: transform 180ms ease, box-shadow 180ms ease; }
+.dash-banner:hover { transform: scale(1.01); cursor: pointer; box-shadow: 2px 2px 8px rgba(13, 135, 13, 0.477); }
 .dash-banner h2 { margin: 0; font-size: 18px; font-weight: 500; }
 .dash-banner h1 { margin: 2px 0 8px; color: var(--dash-maroon); font-family: "Playfair Display", serif; font-size: 30px; }
 .dash-banner p { margin: 0; color: #6b6257; font-size: 12px; }
@@ -219,8 +220,8 @@
 .attendance-hint { margin: 5px 0 0; color: var(--dash-muted); font-size: 11px; }
 .attendance-search { flex: 0 1 270px; max-width: none; }
 .attendance-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-.attendance-row { display: flex; min-width: 0; align-items: center; gap: 13px; padding: 10px 12px; border: 1px solid #eee8e2; border-radius: 5px; background: #fff; transition: border-color 160ms ease, background 160ms ease; }
-.attendance-row:hover { border-color: #e0cfc2; background: #fdfaf7; }
+.attendance-row { display: flex; min-width: 0; align-items: center; gap: 13px; padding: 10px 12px; border: 1px solid #eee8e2; border-radius: 5px; background: #fff; transition: transform 180ms ease, border-color 160ms ease, background 160ms ease, box-shadow 180ms ease; }
+.attendance-row:hover { transform: scale(1.15); cursor: pointer; border-color: #e0cfc2; background: #fdfaf7; box-shadow: 2px 2px 8px rgba(13, 135, 13, 0.477); }
 .attendance-date-stamp { display: flex; width: 42px; height: 44px; flex: 0 0 42px; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; color: var(--dash-maroon); background: #f7eee5; }
 .attendance-date-stamp strong { font-size: 16px; line-height: 1.1; }
 .attendance-date-stamp span { font-size: 9px; text-transform: uppercase; }
